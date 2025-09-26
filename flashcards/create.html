@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Flashcard Set</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f4f4f9;
+    }
+    h1 {
+      text-align: center;
+    }
+    input, textarea {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 8px;
+      font-size: 1rem;
+    }
+    .term {
+      background: white;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    .deleteBtn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    button {
+      margin: 10px 5px 0 0;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #007bff;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="pageTitle">Create a New Set</h1>
+  <input id="setName" type="text" placeholder="Enter set name" />
+
+  <div id="termsContainer"></div>
+  <button onclick="addTerm()">+ Add Term</button>
+  <button onclick="saveSet()">Save Set</button>
+
+  <script src="script.js"></script>
+  <script>
+    loadForEdit(); // check if editing or creating
+    addTerm(); // start with one term if new
+
+    function addTerm(term = { term: '', definition: '' }) {
+      const container = document.getElementById('termsContainer');
+      const div = document.createElement('div');
+      div.classList.add('term');
+      div.innerHTML = `
+        <input type="text" placeholder="Enter term" value="${term.term}" />
+        <textarea placeholder="Enter definition">${term.definition}</textarea>
+        <button class="deleteBtn" onclick="deleteTerm(this)">Delete</button>
+      `;
+      container.appendChild(div);
+    }
+
+    function deleteTerm(button) {
+      button.parentElement.remove();
+    }
+
+    function saveSet() {
+      const setName = document.getElementById('setName').value.trim();
+      if (!setName) {
+        alert("Please enter a set name.");
+        return;
+      }
+      const terms = Array.from(document.querySelectorAll('.term')).map(termDiv => {
+        const inputs = termDiv.querySelectorAll('input, textarea');
+        return {
+          question: inputs[0].value.trim(),
+          answer: inputs[1].value.trim()
+        };
+      }).filter(t => t.question && t.answer);
+
+      if (terms.length === 0) {
+        alert("Please add at least one term with a question and answer.");
+        return;
+      }
+
+      let sets = JSON.parse(localStorage.getItem("flashcardSets") || "[]");
+      sets.push({ name: setName, terms });
+      localStorage.setItem("flashcardSets", JSON.stringify(sets));
+      window.location.href = "index.html";
+    }
+
+    function loadForEdit() {
+      // Load logic here
+    }
+  </script>
+</body>
+</html>
