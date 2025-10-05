@@ -1,34 +1,44 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" href="favicon.png">
   <title>Flashcard Sets</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f9; }
+    body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 20px; }
+    /* Theme base */
+    body.theme-light { background:#f4f6fb; color:#0f172a; }
+    body.theme-dark { background:#0f172a; color:#e2e8f0; }
+    /* Top bar */
+    .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+    #themeToggle { border:1px solid rgba(148,163,184,.4); background:transparent; color:inherit; padding:8px 12px; border-radius:8px; cursor:pointer; }
     h1 { text-align: center; }
-    .set {
-      background: white; padding: 15px; margin: 10px 0; border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; position: relative;
-    }
+    .set { padding: 15px; margin: 10px 0; border-radius: 12px; cursor: pointer; position: relative; border:1px solid rgba(148,163,184,.25); }
+    body.theme-dark .set { background:#111827; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+    body.theme-light .set { background:#ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
     .row { display: flex; align-items: center; justify-content: space-between; }
     .actions { display: flex; gap: 8px; }
     .btn {
       padding: 8px 14px; border: none; border-radius: 8px; cursor: pointer; font-size: .95rem;
     }
-    .primary { background: #007bff; color: white; }
-    .primary:hover { background: #0056b3; }
-    .warn { background: #ffc107; color: #333; }
-    .warn:hover { background: #e0a800; }
-    .danger { background: #dc3545; color: #fff; }
-    .danger:hover { background: #b52a37; }
+    .primary { background: #2563eb; color: white; }
+    .primary:hover { background: #1d4ed8; }
+    .warn { background: #f59e0b; color: #111827; }
+    .warn:hover { background: #d97706; }
+    .danger { background: #ef4444; color: #fff; }
+    .danger:hover { background: #dc2626; }
   </style>
 </head>
 <body>
-  <h1>My Flashcard Sets</h1>
+  <div class="topbar">
+    <h1>My Flashcard Sets</h1>
+    <button id="themeToggle">Light Mode</button>
+  </div>
   <button class="btn primary" onclick="localStorage.removeItem('editSetIndex'); location.href='create.html'">+ Make New Set</button>
   <div id="setsContainer"></div>
 
   <script src="script.js"></script>
-  <script>renderSets();</script>
+  <script>renderSets(); initTheme();</script>
 </body>
 </html>

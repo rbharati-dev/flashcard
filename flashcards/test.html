@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="favicon.png">
+  <title>Flashcard Test</title>
+  <style>
+    body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 20px; text-align: center; }
+    body.theme-light { background:#f4f6fb; color:#0f172a; }
+    body.theme-dark { background:#0f172a; color:#e2e8f0; }
+    .topbar { position:absolute; top:16px; right:16px; }
+    #themeToggle { border:1px solid rgba(148,163,184,.4); background:transparent; color:inherit; padding:8px 12px; border-radius:8px; cursor:pointer; }
+    .card {
+      width: 600px; height: 350px; margin: 20px auto;
+      background: #0b1220; border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      border:2px solid rgba(255,255,255,.35);
+      color:#e5e7eb;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; padding: 20px; cursor: pointer;
+    }
+    .controls { margin-top: 15px; }
+    button {
+      margin: 8px; padding: 10px 20px; border: none; border-radius: 8px;
+      cursor: pointer; font-size: 1rem; color: #fff;
+    }
+    #btnCorrect { background: #10b981; }
+    #btnWrong { background: #ef4444; }
+  </style>
+</head>
+  <body>
+  <div class="topbar"><button id="themeToggle">Light Mode</button></div>
+  <h1 id="setTitle"></h1>
+  <h2 id="timer">Time: 0s</h2>
+  <div class="card" id="testCard">Click to flip</div>
+  <div class="controls">
+    <button id="btnCorrect">Correct</button>
+    <button id="btnWrong">Wrong</button>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    initTheme();
+    startTest();
+  </script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="favicon.png">
+  <title>Test Results</title>
+  <style>
+    body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: #0f172a; color:#e2e8f0; padding: 40px; text-align: center; }
+    body.theme-light { background:#f4f6fb; color:#0f172a; }
+    body.theme-dark { background:#0f172a; color:#e2e8f0; }
+    .topbar { position:absolute; top:16px; right:16px; }
+    #themeToggle { border:1px solid rgba(148,163,184,.4); background:transparent; color:inherit; padding:8px 12px; border-radius:8px; cursor:pointer; }
+    .box {
+      max-width: 500px; margin: auto; padding: 30px; background: #0b1220;
+      border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    h1 { margin-bottom: 20px; }
+    p { font-size: 1.2rem; margin: 10px 0; }
+    button {
+      margin-top: 20px; padding: 12px 20px; border: none; border-radius: 8px;
+      background: #007bff; color: #fff; cursor: pointer; font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar"><button id="themeToggle">Light Mode</button></div>
+  <div class="box">
+    <h1>Test Results</h1>
+    <p id="summary"></p>
+    <button onclick="location.href='index.html'">Back to Home</button>
+  </div>
+  <script>
+    initTheme();
+    const results = JSON.parse(localStorage.getItem("testResults") || "{}");
+    if (results) {
+      document.getElementById("summary").textContent =
+        `Score: ${results.correct}/${results.total} (${results.percent}%) | Time: ${results.time}s`;
+    }
+  </script>
+</body>
+</html>

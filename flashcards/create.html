@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" href="favicon.png">
   <title>Create Flashcard Set</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background: #f4f4f9;
-    }
+    body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 20px; color: inherit; }
+    body.theme-light { background:#f4f6fb; color:#0f172a; }
+    body.theme-dark { background:#0f172a; color:#e2e8f0; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+    #themeToggle { border:1px solid rgba(148,163,184,.4); background:transparent; color:inherit; padding:8px 12px; border-radius:8px; cursor:pointer; }
     h1 {
       text-align: center;
     }
@@ -20,13 +21,15 @@
       font-size: 1rem;
     }
     .term {
-      background: white;
+      background: #111827;
       padding: 10px;
       margin: 10px 0;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
       position: relative;
+      border:1px solid rgba(148,163,184,.25);
     }
+    body.theme-light .term{ background:#ffffff; box-shadow:0 2px 6px rgba(0,0,0,.08); }
     .deleteBtn {
       position: absolute;
       top: 10px;
@@ -43,73 +46,84 @@
       padding: 10px 20px;
       border: none;
       border-radius: 8px;
-      background: #007bff;
+      background: #2563eb;
       color: white;
       font-size: 1rem;
       cursor: pointer;
     }
     button:hover {
-      background: #0056b3;
+      background: #1d4ed8;
     }
   </style>
 </head>
 <body>
-  <h1 id="pageTitle">Create a New Set</h1>
+  <div class="topbar">
+    <h1 id="pageTitle">Create a New Set</h1>
+    <button id="themeToggle">Light Mode</button>
+  </div>
   <input id="setName" type="text" placeholder="Enter set name" />
 
   <div id="termsContainer"></div>
   <button onclick="addTerm()">+ Add Term</button>
+  <input type="file" id="csvFile" accept=".csv" style="margin-left:6px;" />
+  <button id="importCsvBtn" type="button" style="background:#10b981">Import CSV</button>
   <button onclick="saveSet()">Save Set</button>
+  <button id="deleteSetBtn" style="display:none;background:#dc3545">Delete Set</button>
+  <button id="exitBtn" type="button" style="background:#6b7280" onclick="window.location.href='index.html'">Exit</button>
 
   <script src="script.js"></script>
   <script>
-    loadForEdit(); // check if editing or creating
-    addTerm(); // start with one term if new
-
-    function addTerm(term = { term: '', definition: '' }) {
-      const container = document.getElementById('termsContainer');
-      const div = document.createElement('div');
-      div.classList.add('term');
-      div.innerHTML = `
-        <input type="text" placeholder="Enter term" value="${term.term}" />
-        <textarea placeholder="Enter definition">${term.definition}</textarea>
-        <button class="deleteBtn" onclick="deleteTerm(this)">Delete</button>
-      `;
-      container.appendChild(div);
+  loadForEdit(); // will populate fields if editing
+  if (!document.querySelector('.term')) {
+    addTerm(); // only add a blank term if creating new
+  }
+  initTheme();
+  // Show delete button when editing existing set
+  (function(){
+    const idx = localStorage.getItem('editSetIndex');
+    const btn = document.getElementById('deleteSetBtn');
+    if (btn && idx !== null) {
+      btn.style.display = 'inline-block';
+      btn.addEventListener('click', function(){
+        if (confirm('Delete this set?')) {
+          const sets = getSets();
+          if (sets[Number(idx)]) {
+            sets.splice(Number(idx), 1);
+            saveSets(sets);
+          }
+          localStorage.removeItem('editSetIndex');
+          window.location.href = 'index.html';
+        }
+      });
     }
+  })();
 
-    function deleteTerm(button) {
-      button.parentElement.remove();
-    }
-
-    function saveSet() {
-      const setName = document.getElementById('setName').value.trim();
-      if (!setName) {
-        alert("Please enter a set name.");
-        return;
-      }
-      const terms = Array.from(document.querySelectorAll('.term')).map(termDiv => {
-        const inputs = termDiv.querySelectorAll('input, textarea');
-        return {
-          question: inputs[0].value.trim(),
-          answer: inputs[1].value.trim()
-        };
-      }).filter(t => t.question && t.answer);
-
-      if (terms.length === 0) {
-        alert("Please add at least one term with a question and answer.");
-        return;
-      }
-
-      let sets = JSON.parse(localStorage.getItem("flashcardSets") || "[]");
-      sets.push({ name: setName, terms });
-      localStorage.setItem("flashcardSets", JSON.stringify(sets));
-      window.location.href = "index.html";
-    }
-
-    function loadForEdit() {
-      // Load logic here
-    }
-  </script>
+  // CSV import: expects two columns: question,answer
+  (function(){
+    const fileInput = document.getElementById('csvFile');
+    const btn = document.getElementById('importCsvBtn');
+    if (!fileInput || !btn) return;
+    btn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => {
+      const f = fileInput.files?.[0];
+      if (!f) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const text = reader.result.toString();
+          const rows = parseCSV(text);
+          if (!rows || rows.length === 0) return;
+          // Heuristic: first row is header if not two meaningful cells
+          const start = (rows[0] && rows[0][0] && rows[0][1] && rows[0][0].toLowerCase().includes('question')) ? 1 : 0;
+          for (let i = start; i < rows.length; i++) {
+            const [q,a] = rows[i];
+            if (q && a) addTerm(q, a);
+          }
+        } catch(e) { alert('Failed to parse CSV'); }
+      };
+      reader.readAsText(f);
+    });
+  })();
+</script>
 </body>
 </html>
